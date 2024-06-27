@@ -3,21 +3,18 @@ import sys
 import time
 from pygame.locals import *
 import random
-# Inicializa o Pygame
-pygame.init()
+# foi necessário ajuda de IA e códigos prontos
 
-# Configurações da tela
+pygame.init()
 LARGURA, ALTURA = 800, 600
 TELA = pygame.display.set_mode((LARGURA, ALTURA))
 pygame.display.set_caption("Jogo da Forca")
 
-# Cores
 BRANCO = (255, 255, 255)
 PRETO = (0, 0, 0)
 VERMELHO = (255, 0, 0)
 VERDE = (0, 255, 0)
 
-# Fonte
 FONTE = pygame.font.SysFont('comicsans', 40)
 FONTE_PEQUENA = pygame.font.SysFont('comicsans', 30)
 
@@ -70,8 +67,6 @@ def desenha_forca(tentativas_restantes):
         pygame.draw.line(TELA, PRETO, (400, 320), (450, 380), 5) # perna esquerda
 
 
-    
-
 # Função para desenhar a tela principal do jogo
 def desenha_tela():
     TELA.fill(BRANCO)
@@ -108,11 +103,13 @@ def desenha_tela_final(mensagem, cor):
 
 # Função para reiniciar o jogo
 def reiniciar_jogo():
-    global letras_palavra, letras_usadas, tentativas, jogo_terminado
+    global letras_palavra, letras_usadas, tentativas, jogo_terminado, palavra
     letras_palavra = set(palavra)
     letras_usadas = set()
     tentativas = 10
     jogo_terminado = False
+    palavra = random.choice(list(aleatório)).upper()
+
 
 # Configurações do relógio
 relogio = pygame.time.Clock()
