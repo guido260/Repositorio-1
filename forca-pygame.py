@@ -1,78 +1,174 @@
 import pygame
+import sys
+import time
 from pygame.locals import *
 import random
-import sys
-
+# Inicializa o Pygame
 pygame.init()
 
-# cores
-branco = (255,255,255)
-preto = (0,0,0)
+# Configurações da tela
+LARGURA, ALTURA = 800, 600
+TELA = pygame.display.set_mode((LARGURA, ALTURA))
+pygame.display.set_caption("Jogo da Forca")
 
-# resolução
-screen = pygame.display.set_mode((800,600)) 
+# Cores
+BRANCO = (255, 255, 255)
+PRETO = (0, 0, 0)
+VERMELHO = (255, 0, 0)
+VERDE = (0, 255, 0)
 
-# fonte
-pygame.font.init()
-font = pygame.font.SysFont('Arial', 50)
-font_rb = pygame.font.SysFont('Arial', 50)
+# Fonte
+FONTE = pygame.font.SysFont('comicsans', 40)
+FONTE_PEQUENA = pygame.font.SysFont('comicsans', 30)
 
-palavras = [
-'Caneta', 'Mesa', 'Cadeira', 'Telefone', 'Relogio', 'Livro', 'Computador', 'Chave', 'Óculos', 'Copo',
-'Carro', 'Bicicleta', 'Escova', 'Garfo', 'Tesoura', 'Faca', 'Colher', 'Escova de dentes', 'TV', 
-'Martelo', 'Banana', 'Abacaxi', 'Morango', 'Pessego', 'Uva','Limao', 'Melancia', 'Laranja', 'Kiwi',
-'Manga', 'Cereja', 'Melao', 'Pera', 'Abacate', 'Framboesa', 'Amora', 'Mirtilo', 'Coco', 'Goiaba'
-'Cachorro', 'Gato', 'Elefante', 'Leao', 'Tigre', 'Girafa', 'Urso', 'Rato', 'Pássaro', 'Cavalo',
-'Macaco', 'Cobra', 'Panda', 'Coelho', 'Galinha', 'Pato', 'Peixe', 'Tubarão', 'Baleia', 'Jacare'
-]
+# Palavra para adivinhar
+aleatório = {'Caneta', 'Mesa', 'Cadeira', 'Telefone', 'Relogio', 'Livro', 'Computador', 'Chave', 'Óculos', 'Copo',
+          'Carro', 'Bicicleta', 'Escova', 'Garfo', 'Tesoura', 'Faca', 'Colher', 'Escova de dentes', 'TV', 'Martelo', 'Banana', 'Abacaxi', 'Morango', 'Pessego', 'Uva', 'Limao', 'Melancia', 'Laranja', 'Kiwi',
+         'Manga', 'Cereja', 'Melao', 'Pera', 'Abacate', 'Framboesa', 'Amora', 'Mirtilo', 'Coco', 'Goiaba', 'Cachorro', 'Gato', 'Elefante', 'Leao', 'Tigre', 'Girafa', 'Urso', 'Rato', 'Pássaro', 'Cavalo',
+          'Macaco', 'Cobra', 'Panda', 'Coelho', 'Galinha', 'Pato', 'Peixe', 'Tubarão', 'Baleia', 'Jacare'}
 
-palavra_gerada = ''
-palavra_escondidinha = ''
-final = True
-chance = 10
-letra = ''
-click_last_status = False
+palavra = random.choice(list(aleatório)).upper()
+letras_palavra = set(palavra)
+letras_usadas = set()
+tentativas = 10
+jogo_terminado = False
 
-'''
-def forca(screen, chance):
-    if chance == 9:
-        pygame.draw.rect(screen, (preto), (100, 500, 200, 10))
-        pygame.draw.rect(screen, (preto), (100, 100, 10, 400))
-        pygame.draw.rect(screen, (preto), )
-    if chance == 8:
-        pygame.draw
-    if chance == 7:
-        pygame.draw
-    if chance == 6:
-        pygame.draw
-    if chance == 5:
-        pygame.draw
-    if chance == 4:
-        pygame.draw
-    if chance == 3:
-        pygame.draw
-    if chance == 2:
-        pygame.draw
-    if chance == 1:
-        pygame.draw
-    if chance == 0:
-        pygame.draw
-'''
-while True:
-    for event in pygame.event.get():
-        # evento de fechar o jogo
-        if event.type == QUIT:
-            pygame.quit()
-            sys.exit()
-        
-        # evento de pressionar uma tecla
-        if event.type == pygame.KEYDOWN:
-            letra = str(pygame.key.name(event.key)).upper()
-            print(letra) #teste
+# Função para desenhar a forca e o boneco
+def desenha_forca(tentativas_restantes):
+
+    if tentativas_restantes <= 9:
+        pygame.draw.rect(TELA, PRETO, (150, 500, 200, 20))  # base
+
+    if tentativas_restantes <= 8:
+        pygame.draw.line(TELA, PRETO, (250, 500), (250, 100), 7)  # poste vertical
+        pygame.draw.line(TELA, PRETO, (400, 100), (400, 150), 7)  # corda
+        pygame.draw.line(TELA, PRETO, (250, 100), (400, 100), 7)  # poste horizontal
+
+    if tentativas_restantes <= 7:
+        pygame.draw.circle(TELA, PRETO, (400, 180), 30, 5)  # cabeça
+    if tentativas_restantes <= 6:
+        pygame.draw.line(TELA, PRETO, (385, 170), (395, 180), 3)  # olho direito
+        pygame.draw.line(TELA, PRETO, (395, 170), (385, 180), 3)  # olho direito
+
+    if tentativas_restantes <= 5:
+        pygame.draw.line(TELA, PRETO, (405, 170), (415, 180), 3)  # olho esquerdo
+        pygame.draw.line(TELA, PRETO, (415, 170), (405, 180), 3)  # olho esquerdo
+
+    if tentativas_restantes <= 4:
+        pygame.draw.line(TELA, PRETO, (400, 210), (400, 320), 5)  # tronco
+
+    if tentativas_restantes <= 3:
+        pygame.draw.line(TELA, PRETO, (400, 240), (350, 300), 5)  # braço direito
+
+    if tentativas_restantes <= 2:
+        pygame.draw.line(TELA, PRETO, (400, 240), (450, 300), 5)  # braço esquerdo
+
+    if tentativas_restantes <= 1:
+        pygame.draw.line(TELA, PRETO, (400, 320), (350, 380), 5) # perna direita
     
-    #forca(screen, chance)
-    pygame.draw.rect(screen, (branco), (100, 500, 200, 10))
-    pygame.draw.rect(screen, (branco), (150, 100, 10, 400))
+    if tentativas_restantes <= 0:
+        pygame.draw.line(TELA, PRETO, (400, 320), (450, 380), 5) # perna esquerda
+
+
     
+
+# Função para desenhar a tela principal do jogo
+def desenha_tela():
+    TELA.fill(BRANCO)
     
+    # Desenha as letras já usadas
+    texto_letras_usadas = " ".join(letras_usadas)
+    rotulo_letras_usadas = FONTE_PEQUENA.render(f"Letras usadas: {texto_letras_usadas}", 1, PRETO)
+    TELA.blit(rotulo_letras_usadas, (20, 20))
+
+    # Desenha a palavra com as letras descobertas
+    palavra_exibida = [letra if letra in letras_usadas else "_" for letra in palavra]
+    rotulo_palavra = FONTE.render(" ".join(palavra_exibida), 1, PRETO)
+    TELA.blit(rotulo_palavra, (LARGURA // 2 - rotulo_palavra.get_width() // 2, ALTURA - 100))
+
+    # Desenha as tentativas restantes
+    rotulo_tentativas = FONTE_PEQUENA.render(f"Tentativas restantes: {tentativas}", 1, PRETO)
+    TELA.blit(rotulo_tentativas, (20, 60))
+
+    # Desenha a forca e o boneco
+    desenha_forca(tentativas)
+
     pygame.display.update()
+
+# Função para desenhar a tela final
+def desenha_tela_final(mensagem, cor):
+    TELA.fill(BRANCO)
+    rotulo_final = FONTE.render(mensagem, 1, cor)
+    TELA.blit(rotulo_final, (LARGURA // 2 - rotulo_final.get_width() // 2, 200))
+
+    rotulo_reiniciar = FONTE_PEQUENA.render("Pressione 'R' para reiniciar", 1, PRETO)
+    TELA.blit(rotulo_reiniciar, (LARGURA // 2 - rotulo_reiniciar.get_width() // 2, 300))
+
+    pygame.display.update()
+
+# Função para reiniciar o jogo
+def reiniciar_jogo():
+    global letras_palavra, letras_usadas, tentativas, jogo_terminado
+    letras_palavra = set(palavra)
+    letras_usadas = set()
+    tentativas = 10
+    jogo_terminado = False
+
+# Configurações do relógio
+relogio = pygame.time.Clock()
+executando = True
+mensagem_erro = ""
+tempo_erro = 0
+
+while executando:
+    relogio.tick(60)
+    if jogo_terminado:
+        if tentativas == 0:
+            desenha_tela_final("Você perdeu! Tente novamente.", VERMELHO)
+        else:
+            desenha_tela_final("Parabéns! Você ganhou!", VERDE)
+
+        for evento in pygame.event.get():
+            if evento.type == QUIT:
+                executando = False
+            if evento.type == KEYDOWN:
+                if evento.key == K_r:
+                    reiniciar_jogo()
+
+    else:
+        desenha_tela()
+        if mensagem_erro and time.time() - tempo_erro > 3:
+            mensagem_erro = ""
+
+        for evento in pygame.event.get():
+            if evento.type == QUIT:
+                executando = False
+            if evento.type == KEYDOWN:
+                if evento.key == K_ESCAPE:
+                    executando = False
+                if evento.unicode.isalpha():
+                    letra = evento.unicode.upper()
+                    if letra in letras_usadas:
+                        mensagem_erro = f"A letra {letra} já foi usada."
+                        tempo_erro = time.time()
+                    elif letra in letras_palavra:
+                        letras_usadas.add(letra)
+                        letras_palavra.remove(letra)
+                        if len(letras_palavra) == 0:
+                            jogo_terminado = True
+                    else:
+                        letras_usadas.add(letra)
+                        tentativas -= 1
+                        if tentativas == 0:
+                            jogo_terminado = True
+                else:
+                    mensagem_erro = "Digite apenas letras."
+                    tempo_erro = time.time()
+
+        if mensagem_erro:
+            rotulo_erro = FONTE_PEQUENA.render(mensagem_erro, 1, VERMELHO)
+            TELA.blit(rotulo_erro, (20, 100))
+            pygame.display.update()
+
+pygame.quit()
+sys.exit()
